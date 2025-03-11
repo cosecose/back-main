@@ -1,23 +1,20 @@
-# Step 1: JDK 환경에서 빌드
-FROM maven:3.8.8-eclipse-temurin-17 AS build
+# Step 1: Gradle 빌드 단계
+FROM gradle:8.5-jdk17 AS build
 
+# 작업 디렉토리 설정
 WORKDIR /app
 
-# 의존성 캐싱을 위해 먼저 복사
-COPY pom.xml .
-RUN mvn dependency:go-offline -B
-
-# 소스 코드 복사 및 빌드
+# 프로젝트 코드 복사 및 빌드 수행
 COPY . .
-RUN mvn clean package -DskipTests
+RUN gradle clean build -x test
 
-# Step 2: 실행 환경 (JRE)
+# Step 2: 실행 단계 (Spring Boot 실행)
 FROM openjdk:17-jdk-slim
 
 WORKDIR /app
 
-# 빌드된 JAR 복사
-COPY --from=build /app/target/*.jar app.jar
+# 빌드된 JAR 파일 복사 (경로는 프로젝트 설정에 따라 다를 수 있음)
+COPY --from=build /app/build/libs/*.jar app.jar
 
 # 8080 포트 개방
 EXPOSE 8080
