@@ -1,5 +1,5 @@
 # Step 1: JDK 환경에서 빌드
-FROM maven:3.8.6-openjdk-17 AS build
+FROM maven:3.8.8-eclipse-temurin-17 AS build
 
 WORKDIR /app
 
